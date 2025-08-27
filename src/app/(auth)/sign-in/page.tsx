@@ -1,9 +1,23 @@
-import React from 'react'
+'use client'
 
-function page() {
+import { useSession, signIn, signOut } from "next-auth/react"
+
+export default function page() {
+
+  const { data: session } = useSession();
+
+  if (session) {
+    return (
+      <>
+        Signed in as {session.user.email} <br />
+        <button onClick={() => signOut()}>Sign out</button>
+      </>
+    )
+  }
   return (
-    <div>sign in page</div>
+    <>
+      Not signed in <br />
+      <button className="bg-blue-600 cursor-pointer px-3 py-1 m-4" onClick={() => signIn()}>Sign in</button>
+    </>
   )
 }
-
-export default page
