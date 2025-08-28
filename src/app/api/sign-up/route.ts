@@ -94,8 +94,14 @@ export async function POST(request: Request) {
             { status: 500 });
         }
 
-        return Response.json({success: true, message: 'User registered successfully. Please verify your account.'},
-            {status: 201}
+        return Response.json({
+                success: true,
+                message: 'User registered successfully. ' + emailResp.message
+            }
+            ,
+            {
+                status: 201
+            }
         );
 
     } catch (error) {
