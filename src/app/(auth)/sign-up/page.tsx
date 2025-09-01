@@ -49,8 +49,6 @@ function SignUpForm() {
 
     const checkUsernameUnique = async () => {
 
-        console.log(debouncedUsername);
-
         if (debouncedUsername) {
             setIsCheckingUsername(true);
             setUsernameMsg('');
