@@ -32,7 +32,23 @@ function SignInForm() {
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
 
+    const result = await signIn('credentials', {
+        redirect: false,
+        identifier: data.identifier,
+        password: data.password,
+    });
 
+    if (result?.error) {
+        console.log(result.error);
+        toast('Incorrect username/email or password');
+    }
+    else {
+        toast('Login Successful');
+    }
+
+    if (result?.url) {
+        router.replace('/dashboard');
+    }
   }
 
   return (
