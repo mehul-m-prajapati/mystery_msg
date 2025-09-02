@@ -1,5 +1,6 @@
 'use client';
 
+import MessageCard from '@/components/MessageCard';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
@@ -17,18 +18,16 @@ import { AcceptMessageSchema } from '@/schemas/acceptMessageSchema';
 
 
 function UserDashboard() {
-  const { data: session } = useSession();
-  const { username } = session?.user as User;
-  const baseUrl = `${window.location.protocol}//${window.location.host}`;
-  const profileUrl = `${baseUrl}/u/${username}`;
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
 
-
   const handleDeleteMessage = (messageId: string) => {
-
+    setMessages(messages.filter(m => m._id !== messageId));
   }
+
+  const { data: session } = useSession();
 
   const form = useForm({
     resolver: zodResolver(AcceptMessageSchema),
@@ -38,8 +37,21 @@ function UserDashboard() {
   const acceptMessages = watch('acceptMessages');
 
   const fetchAcceptMessages = useCallback(async () => {
-    },
-  []);
+        setIsSwitchLoading(true);
+        try {
+
+            const resp = await axios.get('/api/accept-messages');
+            setValue('acceptMessages', resp.data.isAcceptingMessages);
+        }
+        catch (error) {
+            const axiosError = error as AxiosError<ApiResponse>;
+            toast(axiosError.response?.data.message ?? 'Failed to fetch accept-messages');
+        }
+        finally {
+            setIsSwitchLoading(false);
+        }
+    }, [setValue]
+  );
 
   const fetchMessages = useCallback(
     async (refresh: boolean = false) => {
@@ -48,17 +60,39 @@ function UserDashboard() {
 
   // Fetch initial state from the server
   useEffect(() => {
-  }, []);
+   if (!session || !session.user)
+        return;
+
+    fetchMessages();
+    fetchAcceptMessages();
+  }, [fetchMessages, fetchAcceptMessages, session, setValue]);
 
   // Handle switch change
   const handleSwitchChange = async () => {
+    try {
+        const resp = await axios.post('/api/accept-messages', {
+            acceptMessages: !acceptMessages,
+        })
+        setValue('acceptMessages', !acceptMessages);
+        toast(resp.data.message);
+    }
+    catch (error) {
+        const axiosError = error as AxiosError<ApiResponse>;
+        toast(axiosError.response?.data.message ?? 'Failed to update acceptMessages');
+    }
   }
 
   if (!session || !session.user) {
     return <div>No Auth data found</div>;
   }
 
+  const { username } = session.user as User;
+  const baseUrl = `${window.location.protocol}//${window.location.host}`;
+  const profileUrl = `${baseUrl}/u/${username}`;
+
   const copyToClipboard = () => {
+    navigator.clipboard.writeText(profileUrl);
+    toast('Profile URL has been copied to clipboard.');
   }
 
   return (
@@ -110,14 +144,17 @@ function UserDashboard() {
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
         {messages.length > 0 ? (
             messages.map((message, index) => (
-                <>
-                    <p>{index}</p>
-                </>
-            )))
-            :
-            (<p>No messages to display.</p>)}
+                <MessageCard
+                    key={message._id as string}
+                    message={message}
+                    onMessageDelete={handleDeleteMessage}
+                />
+            ))
+            ) : (
+            <p>No messages to display.</p>
+            )
+        }
       </div>
-
     </div>
   )
 }
