@@ -119,7 +119,7 @@ function SendMessage() {
                             Please wait
                         </Button>
                         ) : (
-                        <Button type="submit" disabled={isLoading || !messageContent}>
+                        <Button type="submit" className='cursor-pointer"' disabled={isLoading || !messageContent}>
                             Send It
                         </Button>
                         )}
@@ -129,7 +129,7 @@ function SendMessage() {
 
         <div className="space-y-4 my-8">
             <div className="space-y-2">
-                <Button onClick={fetchSuggestedMessages} className="my-4" disabled={isSuggestLoading}>
+                <Button onClick={fetchSuggestedMessages} className="my-4 cursor-pointer" disabled={isSuggestLoading}>
                     Suggest Messages
                 </Button>
                 <p>Click on any message below to select it.</p>
@@ -146,10 +146,18 @@ function SendMessage() {
                             {error.message}
                         </p>
                         ) : (
-                            <Button variant="outline" className="mb-2"
-                            onClick={() => handleMessageClick(completion)}>
-                                {completion}
-                            </Button>
+                            <div>
+                                {completion?.split('||').filter(Boolean).map((msg, idx) => (
+                                    <Button
+                                        variant="outline"
+                                        className='cursor-pointer mx-2'
+                                        key={idx}
+                                        onClick={() => handleMessageClick(msg)}
+                                    >
+                                        {msg}
+                                    </Button>
+                                ))}
+                            </div>
                         )
                     }
                 </CardContent>

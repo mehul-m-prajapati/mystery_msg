@@ -5,7 +5,7 @@ const openai = new OpenAI({
     baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
 });
 
-export async function GET(req: Request) {
+export async function POST(req: Request) {
 
     try {
         const prompt = "Create a list of three open-ended and engaging questions formatted as a single string.\
@@ -31,9 +31,8 @@ export async function GET(req: Request) {
         // content is the ans given by gemini after prompt
         const content = resp.choices[0].message.content;
 
-        return Response.json(
-            { message: content, success: true },
-            { status: 200 }
+        return new Response(content,
+            { status: 200, headers: {'Content-Type': 'text/plain'} }
         );
     }
     catch (error) {
