@@ -83,12 +83,13 @@ function UserDashboard() {
 
   // Fetch initial state from the server
   useEffect(() => {
-   if (!session || !session.user)
+
+   if (!session?.user?._id)
         return;
 
     fetchMessages();
     fetchAcceptMessages();
-  }, [fetchMessages, fetchAcceptMessages, session, setValue]);
+  }, [fetchMessages, fetchAcceptMessages, session?.user?._id, setValue]);
 
   // Handle switch change
   const handleSwitchChange = async () => {
@@ -150,7 +151,7 @@ function UserDashboard() {
         <Separator />
 
         <Button
-            className="mt-4"
+            className="mt-4 cursor-pointer"
             variant="outline"
             onClick={(e) => {
                 e.preventDefault();

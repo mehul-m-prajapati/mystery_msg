@@ -5,7 +5,7 @@ const openai = new OpenAI({
     baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
 });
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
 
     try {
         const prompt = "Create a list of three open-ended and engaging questions formatted as a single string.\
