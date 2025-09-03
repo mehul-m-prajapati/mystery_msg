@@ -25,6 +25,7 @@ function UserDashboard() {
 
   const handleDeleteMessage = (messageId: string) => {
     setMessages(messages.filter(m => m._id !== messageId));
+    // do backend api call to delete msg from db
   }
 
   const { data: session } = useSession();
@@ -34,6 +35,7 @@ function UserDashboard() {
   });
 
   const { register, watch, setValue } = form;
+  // watch on UI field name: acceptMessages
   const acceptMessages = watch('acceptMessages');
 
   const fetchAcceptMessages = useCallback(async () => {
@@ -53,10 +55,31 @@ function UserDashboard() {
     }, [setValue]
   );
 
-  const fetchMessages = useCallback(
-    async (refresh: boolean = false) => {
-    },
-  []);
+  const fetchMessages = useCallback(async (refresh: boolean = false) => {
+        setIsLoading(true);
+        setIsSwitchLoading(false);
+
+        try {
+            const resp = await axios.get<ApiResponse>('/api/get-messages');
+            setMessages(resp.data.messages as Message[] || []);
+
+            if (refresh) {
+                toast('Showing latest messages');
+            }
+            else {
+                toast(`Successfully fetched ${resp.data.messages?.length} messages`);
+            }
+        }
+        catch (error) {
+            const axiosError = error as AxiosError<ApiResponse>;
+            toast(axiosError.response?.data.message ?? 'Failed to fetch messages');
+        }
+        finally {
+            setIsLoading(false);
+            setIsSwitchLoading(false);
+        }
+    }, [setMessages, setIsLoading]
+  );
 
   // Fetch initial state from the server
   useEffect(() => {
