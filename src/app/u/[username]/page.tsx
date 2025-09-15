@@ -27,17 +27,13 @@ import { useCompletion } from '@ai-sdk/react';
 
 const initialMessageString =
   "What's your favorite movie?||Do you have any pets?||What's your dream job?";
+
 //-----------------------------------------------------
 function SendMessage() {
 
   const {
-    completion,
-    complete,
-    isLoading: isSuggestLoading,
-    error
-    } = useCompletion({
-    api: '/api/suggest-messages',
-    initialCompletion: initialMessageString
+        completion, complete, isLoading: isSuggestLoading, error
+    } = useCompletion({api: '/api/suggest-messages', initialCompletion: initialMessageString
   });
 
   const params = useParams<{username: string}>();
@@ -50,8 +46,8 @@ function SendMessage() {
   });
 
   const onSubmit = async (data: z.infer<typeof messageSchema>) => {
-
     setIsLoading(true);
+    
     try {
         const resp = await axios.post<ApiResponse>('/api/send-message', {
             ...data,
