@@ -4,9 +4,7 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 import UserModel from "@/model/User";
 
 
-export async function DELETE(
-    request: Request,
-    {params}: {params: { messageid: string }}) {
+export async function DELETE(request: Request, {params}: {params: { messageid: string }}) {
 
         const messageid = params.messageid;
 
